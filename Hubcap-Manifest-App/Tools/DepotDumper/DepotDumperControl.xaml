@@ -1,0 +1,205 @@
+<UserControl x:Class="HubcapManifestApp.Tools.DepotDumper.DepotDumperControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid>
+            <!-- Login View -->
+            <Grid x:Name="LoginView" Visibility="{Binding ShowLoginView, Converter={StaticResource BoolToVis}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="500" Margin="20" HorizontalAlignment="Left">
+
+                    <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Steam Login"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       Margin="0,0,0,15"/>
+
+                            <TextBlock Text="USERNAME"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,5"/>
+                            <TextBox x:Name="UsernameTextBox"
+                                     Margin="0,0,0,15"
+                                     KeyDown="UsernameTextBox_KeyDown"/>
+
+                            <TextBlock Text="PASSWORD"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,5"/>
+                            <PasswordBox x:Name="PasswordBox"
+                                         Margin="0,0,0,15"
+                                         KeyDown="PasswordBox_KeyDown"/>
+
+                            <CheckBox x:Name="DumpUnreleasedCheckBox"
+                                      Content="Dump unreleased apps"
+                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                      Margin="0,0,0,15"/>
+
+                            <TextBlock Text="APP IDS (comma or newline separated, optional)"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,5"/>
+                            <TextBox x:Name="AppIdTextBox"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Height="80"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Margin="0,0,0,20"/>
+
+                            <Button x:Name="SignInButton"
+                                    Content="SIGN IN"
+                                    Click="SignInButton_Click"
+                                    Height="45"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    Margin="0,0,0,10"/>
+
+                            <Button Content="Login with QR Code"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="QrCodeButton_Click"
+                                    Height="40"
+                                    Margin="0,0,0,10"
+                                    FontSize="14"/>
+
+                            <Button Content="Login Anonymously"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="AnonymousButton_Click"
+                                    Height="40"
+                                    FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Progress View -->
+        <Grid x:Name="ProgressView" Visibility="Collapsed">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel MaxWidth="600" Margin="20" HorizontalAlignment="Left">
+
+                    <TextBlock x:Name="ProgressTitle"
+                               Text="Dumping Depot Keys"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <!-- QR Code Section -->
+                    <Border x:Name="QrCodeSection"
+                            Visibility="Collapsed"
+                            Style="{StaticResource ModernCardStyle}"
+                            Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Scan QR Code with Steam Mobile"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,15"/>
+                            <Border Background="White"
+                                    Padding="10"
+                                    CornerRadius="5"
+                                    HorizontalAlignment="Center">
+                                <Image x:Name="QrCodeImage"
+                                       Width="200"
+                                       Height="200"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock x:Name="StatusText"
+                                       Text="Initializing..."
+                                       FontSize="16"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,15"/>
+
+                            <ProgressBar x:Name="ProgressBar"
+                                         Minimum="0"
+                                         Maximum="100"
+                                         Value="0"
+                                         Height="20"
+                                         Margin="0,0,0,10"
+                                         Background="{DynamicResource SecondaryDarkBrush}"
+                                         Foreground="{DynamicResource AccentBrush}"/>
+
+                            <TextBlock x:Name="ProgressText"
+                                       Text="0 / 0"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,15"/>
+
+                            <Border Background="{DynamicResource SecondaryDarkBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
+                                    Height="200">
+                                <ScrollViewer x:Name="LogScrollViewer"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <TextBlock x:Name="LogTextBlock"
+                                               FontFamily="Consolas"
+                                               FontSize="11"
+                                               Padding="10"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,20,0,0">
+                        <Button x:Name="CancelButton"
+                                Content="CANCEL"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Click="CancelButton_Click"
+                                Width="150"
+                                Height="45"
+                                Margin="0,0,15,0"
+                                FontSize="14"
+                                FontWeight="SemiBold"/>
+                        <Button x:Name="BackButton"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Click="DoneButton_Click"
+                                Width="180"
+                                Height="45"
+                                Visibility="Collapsed"
+                                Margin="0,0,15,0"
+                                FontSize="14"
+                                FontWeight="SemiBold"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="ArrowLeft" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="BACK TO LOGIN" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+                        <Button x:Name="UploadButton"
+                                Click="UploadButton_Click"
+                                Width="200"
+                                Height="45"
+                                Visibility="Collapsed"
+                                Margin="0,0,15,0"
+                                FontSize="14"
+                                FontWeight="SemiBold"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Upload" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="UPLOAD TO SERVER" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+                        <Button x:Name="DoneButton"
+                                Content="DONE"
+                                Click="DoneButton_Click"
+                                Width="150"
+                                Height="45"
+                                Visibility="Collapsed"
+                                FontSize="14"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

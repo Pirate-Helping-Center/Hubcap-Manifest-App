@@ -1,0 +1,1232 @@
+<UserControl x:Class="HubcapManifestApp.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:converters="clr-namespace:HubcapManifestApp.Converters">
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock Text="Settings"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Text=" *"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource AccentBrush}"
+                           Visibility="{Binding HasUnsavedChanges, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
+            <CheckBox Content="Single page layout (takes effect after save)"
+                      IsChecked="{Binding SinglePageSettings}"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      FontSize="11"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Tabbed Settings -->
+        <TabControl Grid.Row="1"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Margin="0,0,0,20"
+                    Visibility="{Binding SinglePageSettings, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                    x:Name="TabbedView">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border Name="Border"
+                                        Background="{DynamicResource SecondaryDarkBrush}"
+                                        BorderThickness="0"
+                                        CornerRadius="8,8,0,0"
+                                        Padding="20,10"
+                                        Margin="0,0,5,0">
+                                    <ContentPresenter ContentSource="Header"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- TAB 1: General -->
+            <TabItem Header="General">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+
+                        <!-- Manifest API Configuration -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Hubcap API Key"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Hubcap API Key (must start with 'smm')"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <TextBlock TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11"
+                                           Margin="0,0,0,10">
+                                    <Run Text="How to get your Hubcap API key:"/>
+                                    <LineBreak/>
+                                    <Run Text="1. Go to "/>
+                                    <Hyperlink NavigateUri="https://hubcapmanifest.com/"
+                                               RequestNavigate="Hyperlink_RequestNavigate"
+                                               Foreground="{DynamicResource AccentBrush}">
+                                        <Run Text="https://hubcapmanifest.com/"/>
+                                    </Hyperlink>
+                                    <Run Text=" and login with your Discord account"/>
+                                    <LineBreak/>
+                                    <Run Text="2. Generate your API key: Visit "/>
+                                    <Hyperlink NavigateUri="https://hubcapmanifest.com/api-keys/user"
+                                               RequestNavigate="Hyperlink_RequestNavigate"
+                                               Foreground="{DynamicResource AccentBrush}">
+                                        <Run Text="https://hubcapmanifest.com/api-keys/user"/>
+                                    </Hyperlink>
+                                    <LineBreak/>
+                                    <Run Text="3. View pricing: "/>
+                                    <Hyperlink NavigateUri="https://hubcapmanifest.com/pricing"
+                                               RequestNavigate="Hyperlink_RequestNavigate"
+                                               Foreground="{DynamicResource AccentBrush}">
+                                        <Run Text="https://hubcapmanifest.com/pricing"/>
+                                    </Hyperlink>
+                                    <LineBreak/>
+                                    <Run Text="4. Read the docs: Check the API documentation on the website"/>
+                                </TextBlock>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Masked field (default). PasswordBox cannot bind directly,
+                                         so PasswordChanged in code-behind keeps VM.ApiKey in sync,
+                                         and VM.ApiKey changes are pushed back via the page's loaded handler. -->
+                                    <PasswordBox Grid.Column="0"
+                                                 x:Name="ApiKeyPasswordBox"
+                                                 PasswordChanged="ApiKeyPasswordBox_PasswordChanged"
+                                                 Margin="0,0,10,0"
+                                                 Padding="10,6"
+                                                 VerticalContentAlignment="Center"
+                                                 Visibility="{Binding IsApiKeyVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+
+                                    <!-- Visible field (toggled on with the eye button). -->
+                                    <TextBox Grid.Column="0"
+                                             x:Name="ApiKeyTextBox"
+                                             Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,10,0"
+                                             Padding="10,6"
+                                             VerticalContentAlignment="Center"
+                                             Visibility="{Binding IsApiKeyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                    <!-- Show / hide toggle -->
+                                    <ToggleButton Grid.Column="1"
+                                                  IsChecked="{Binding IsApiKeyVisible}"
+                                                  Margin="0,0,6,0"
+                                                  Padding="8,6"
+                                                  ToolTip="Show / hide API key"
+                                                  Cursor="Hand">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="ToggleButton">
+                                                <Setter Property="Background" Value="{DynamicResource SecondaryDarkBrush}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                                <Setter Property="BorderThickness" Value="1"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border Background="{TemplateBinding Background}"
+                                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                                    CornerRadius="8">
+                                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                                  VerticalAlignment="Center"
+                                                                                  Margin="{TemplateBinding Padding}"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundBrush}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                        <iconPacks:PackIconLucide Width="14" Height="14" VerticalAlignment="Center" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}">
+                                            <iconPacks:PackIconLucide.Style>
+                                                <Style TargetType="iconPacks:PackIconLucide" BasedOn="{StaticResource {x:Type iconPacks:PackIconLucide}}">
+                                                    <Setter Property="Kind" Value="Eye"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsApiKeyVisible}" Value="True">
+                                                            <Setter Property="Kind" Value="EyeOff"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </iconPacks:PackIconLucide.Style>
+                                        </iconPacks:PackIconLucide>
+                                    </ToggleButton>
+
+                                    <!-- Copy -->
+                                    <Button Grid.Column="2"
+                                            Command="{Binding CopyApiKeyCommand}"
+                                            Padding="8,6"
+                                            Margin="0,0,6,0"
+                                            ToolTip="Copy API key to clipboard"
+                                            Cursor="Hand">
+                                        <iconPacks:PackIconLucide Kind="Copy" Width="14" Height="14" VerticalAlignment="Center"/>
+                                    </Button>
+
+                                    <Button Grid.Column="3"
+                                            Content="Validate"
+                                            Command="{Binding ValidateApiKeyCommand}"
+                                            Padding="20,8"/>
+                                </Grid>
+
+                                <TextBlock Text="{Binding StatusMessage}"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           FontSize="12"
+                                           Margin="0,5,0,0"/>
+                                <CheckBox Content="Automatically upload new config keys to Hubcap (helps improve the database)"
+                                          IsChecked="{Binding AutoUploadConfigKeys}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,15,0,0"
+                                          ToolTip="Extracts depot keys from your Steam config.vdf and uploads only new keys that don't already exist on the server. Runs automatically every hour while the app is open. Requires a valid API key."/>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- API Usage Stats -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6"
+                                Visibility="{Binding HasApiStats, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="API Usage"
+                                               FontSize="20"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding RefreshApiStatsCommand}"
+                                            HorizontalAlignment="Right"
+                                            Padding="10,4"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="RefreshCw" Width="12" Height="12" VerticalAlignment="Center"/><TextBlock Text="Refresh" VerticalAlignment="Center" Margin="4,0,0,0" FontSize="11"/></StackPanel></Button>
+                                </Grid>
+                                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8">
+                                    <Run Text="Logged in as "/><Run Text="{Binding ApiUsername, Mode=OneWay}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                </TextBlock>
+
+                                <TextBlock Text="Daily Usage" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border CornerRadius="4" Background="{DynamicResource SecondaryDarkBrush}" Height="8" VerticalAlignment="Center">
+                                        <ProgressBar Value="{Binding DailyUsage}" Maximum="{Binding DailyLimit}"
+                                                     Height="8" Background="Transparent"
+                                                     BorderThickness="0">
+                                            <ProgressBar.Clip>
+                                                <RectangleGeometry RadiusX="4" RadiusY="4" Rect="0,0,10000,8"/>
+                                            </ProgressBar.Clip>
+                                        </ProgressBar>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"
+                                               FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}">
+                                        <Run Text="{Binding DailyUsage, Mode=OneWay}"/><Run Text=" / "/><Run Text="{Binding DailyLimit, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </Grid>
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8">
+                                    <Run Text="{Binding DailyRemaining, Mode=OneWay}"/><Run Text=" downloads remaining today"/>
+                                </TextBlock>
+
+                                <Grid Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}">
+                                        <Run Text="Total API calls: "/><Run Text="{Binding ApiKeyUsageCount, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}">
+                                        <Run Text="Key expires: "/><Run Text="{Binding ApiKeyExpiry, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Theme & Appearance -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Theme &amp; Appearance"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Color Theme"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding SelectedThemeName}"
+                                          SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          FontSize="14"
+                                          Margin="0,0,0,15">
+                                    <ComboBoxItem Content="Default (Steam)" Tag="Default"/>
+                                    <ComboBoxItem Content="True Dark Mode" Tag="Dark"/>
+                                    <ComboBoxItem Content="Light Mode" Tag="Light"/>
+                                    <ComboBoxItem Content="Cherry" Tag="Cherry"/>
+                                    <ComboBoxItem Content="Sunset" Tag="Sunset"/>
+                                    <ComboBoxItem Content="Forest" Tag="Forest"/>
+                                    <ComboBoxItem Content="Grape" Tag="Grape"/>
+                                    <ComboBoxItem Content="Cyberpunk" Tag="Cyberpunk"/>
+                                    <ComboBoxItem Content="Pink" Tag="Pink"/>
+                                    <ComboBoxItem Content="Pastel" Tag="Pastel"/>
+                                    <ComboBoxItem Content="Rainbow" Tag="Rainbow"/>
+                                    <ComboBoxItem Content="Custom" Tag="Custom"/>
+                                </ComboBox>
+
+                                <Border Background="{DynamicResource CardBackgroundBrush}"
+                                        CornerRadius="8"
+                                        Padding="15"
+                                        Margin="0,0,0,15"
+                                        BorderBrush="{DynamicResource AccentBrush}"
+                                        BorderThickness="1"
+                                        Visibility="{Binding IsCustomTheme, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="Custom Theme"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   Margin="0,0,0,6"/>
+                                        <TextBlock Text="Manage your saved presets and build new themes — full color picker, transparency, gradients, and optional background images."
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,12"/>
+                                        <Button Content="Open Theme Editor"
+                                                Command="{Binding OpenThemeEditorCommand}"
+                                                HorizontalAlignment="Left"
+                                                Padding="16,8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Store Page Size (games per page)"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding StorePageSize}"
+                                          SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          FontSize="14"
+                                          Margin="0,0,0,10">
+                                    <ComboBoxItem Content="10 games" Tag="10"/>
+                                    <ComboBoxItem Content="20 games (default)" Tag="20"/>
+                                    <ComboBoxItem Content="30 games" Tag="30"/>
+                                    <ComboBoxItem Content="50 games" Tag="50"/>
+                                    <ComboBoxItem Content="100 games" Tag="100"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Library Page Size (items per page)"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding LibraryPageSize}"
+                                          SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          FontSize="14"
+                                          Margin="0,0,0,10">
+                                    <ComboBoxItem Content="10 items" Tag="10"/>
+                                    <ComboBoxItem Content="20 items (default)" Tag="20"/>
+                                    <ComboBoxItem Content="50 items" Tag="50"/>
+                                    <ComboBoxItem Content="100 items" Tag="100"/>
+                                    <ComboBoxItem Content="Show all (no pagination)" Tag="0"/>
+                                </ComboBox>
+
+                                <CheckBox Content="Hide scrollbars"
+                                          IsChecked="{Binding HideScrollbars}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,10,0,0"
+                                          ToolTip="Hide scrollbars across the app. You can still scroll with mouse wheel or middle-click drag."/>
+
+                                <TextBlock Text="UI Scale"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,15,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Grid.Column="0"
+                                            Value="{Binding UiScale}"
+                                            Minimum="0.7" Maximum="1.5"
+                                            TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                            SmallChange="0.05" LargeChange="0.1"
+                                            IsMoveToPointEnabled="True"
+                                            VerticalAlignment="Center"
+                                            Thumb.DragCompleted="UiScaleSlider_DragCompleted"/>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"
+                                               FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}">
+                                        <Run Text="{Binding UiScale, Mode=OneWay, StringFormat='{}{0:P0}'}"/>
+                                    </TextBlock>
+                                </Grid>
+
+                                <TextBlock Text="Theme changes will be applied when you save settings"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11"
+                                           FontStyle="Italic"
+                                           Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Tool Mode Selection -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Tool Mode"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <RadioButton Content="SteamTools"
+                                                IsChecked="{Binding IsSteamToolsMode}"
+                                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                                FontSize="14"
+                                                Margin="0,0,30,0"
+                                                ToolTip="Standard mode for downloading and installing games"/>
+                                    <RadioButton Content="DepotDownloader"
+                                                IsChecked="{Binding IsDepotDownloaderMode}"
+                                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                                FontSize="14"
+                                                ToolTip="Download actual game files using DepotDownloader with smart filtering"/>
+                                </StackPanel>
+
+                                <TextBlock Text="• SteamTools: Standard download mode"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           Margin="0,0,0,3"/>
+                                <TextBlock Text="• DepotDownloader: Download actual game files with smart language/platform filtering"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"/>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 2: DepotDownloader (only visible when DepotDownloader mode selected) -->
+            <TabItem Header="DepotDownloader">
+                <TabItem.Style>
+                    <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDepotDownloaderMode}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TabItem.Style>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+
+                        <!-- Output Configuration -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Download Configuration"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Output Folder"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding DepotDownloaderOutputPath, UpdateSourceTrigger=PropertyChanged}"
+                                             IsReadOnly="True"
+                                             Margin="0,0,10,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="Browse"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding BrowseDepotOutputPathCommand}"
+                                            Padding="20,8"/>
+                                </Grid>
+
+                                <CheckBox Content="Verify files after download"
+                                          IsChecked="{Binding VerifyFilesAfterDownload}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Verify downloaded files against manifest checksums"/>
+
+                                <TextBlock Text="Max Concurrent Downloads"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0"
+                                              SelectedValue="{Binding MaxConcurrentDownloads}"
+                                              SelectedValuePath="Tag"
+                                              Style="{StaticResource ModernComboBoxStyle}"
+                                              FontSize="14"
+                                              Margin="0,0,10,0"
+                                              MinWidth="200">
+                                        <ComboBoxItem Content="4 connections" Tag="4"/>
+                                        <ComboBoxItem Content="8 connections (default)" Tag="8"/>
+                                        <ComboBoxItem Content="16 connections" Tag="16"/>
+                                        <ComboBoxItem Content="32 connections" Tag="32"/>
+                                    </ComboBox>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="or" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox Text="{Binding CustomMaxDownloads, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="60"
+                                                 Padding="8,8"
+                                                 VerticalContentAlignment="Center"
+                                                 ToolTip="Enter a custom number of concurrent downloads"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Margin="0,10,0,0">
+                                    DepotDownloader will download actual game files from Steam CDN servers.<LineBreak/>
+                                    Downloads will be filtered by language and platform using smart filtering logic.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 5: Steam & Downloads -->
+            <TabItem Header="Steam &amp; Downloads">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+
+                        <!-- Steam Configuration -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Steam Configuration"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Steam Installation Path"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding SteamPath, UpdateSourceTrigger=PropertyChanged}"
+                                             IsReadOnly="True"
+                                             Margin="0,0,10,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="Browse"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding BrowseSteamPathCommand}"
+                                            Padding="20,8"
+                                            Margin="0,0,10,0"/>
+                                    <Button Grid.Column="2"
+                                            Content="Auto-Detect"
+                                            Command="{Binding DetectSteamCommand}"
+                                            Padding="20,8"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Downloads -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Downloads"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Downloads Folder"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding DownloadsPath, UpdateSourceTrigger=PropertyChanged}"
+                                             IsReadOnly="True"
+                                             Margin="0,0,10,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="Browse"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding BrowseDownloadsPathCommand}"
+                                            Padding="20,8"/>
+                                </Grid>
+
+                                <CheckBox Content="Auto-install after download completes"
+                                          IsChecked="{Binding AutoInstallAfterDownload}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,8,0,0"
+                                          ToolTip="Automatically install games after they finish downloading"/>
+
+                                <CheckBox Content="Delete ZIP file after installation"
+                                          IsChecked="{Binding DeleteZipAfterInstall}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,10,0,0"
+                                          ToolTip="Automatically delete the downloaded ZIP file after successful installation"/>
+
+                                <CheckBox Content="Disable depot OS filtering (show macOS/Linux depots)"
+                                          IsChecked="{Binding DisableDepotOsFilter}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,10,0,0"
+                                          ToolTip="Advanced: disables filtering of non-Windows depots during downloads. Enable this if you need macOS or Linux depots."/>
+
+                                <TextBlock Text="Custom Game Directory"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,15,0,5"/>
+                                <TextBlock Text="Scan a custom folder for downloaded games ({appid}.zip or {appid}.lua) to show 'Downloaded' badges in the Store"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding CustomGameDirectory, UpdateSourceTrigger=PropertyChanged}"
+                                             IsReadOnly="True"
+                                             Margin="0,0,10,0"/>
+                                    <Button Grid.Column="1"
+                                            Content="Browse"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding BrowseCustomGameDirectoryCommand}"
+                                            Padding="20,8"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+
+            <!-- TAB 6: Advanced Tools -->
+            <TabItem Header="Advanced Tools">
+                <TabControl Background="Transparent" BorderThickness="0" Margin="0,10,0,0">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border"
+                                                Background="{DynamicResource SecondaryDarkBrush}"
+                                                BorderThickness="0"
+                                                CornerRadius="8,8,0,0"
+                                                Padding="20,10"
+                                                Margin="0,0,5,0">
+                                            <ContentPresenter ContentSource="Header"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <!-- Config VDF Extractor Sub-Tab -->
+                    <TabItem Header="Config VDF Extractor">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+                                <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                                    <StackPanel>
+                                        <TextBlock Text="Config VDF Key Extraction"
+                                                   FontSize="20"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   Margin="0,0,0,15"/>
+
+                                        <TextBlock Text="Config.vdf File Path"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,5"/>
+                                        <Grid Margin="0,0,0,15">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Text="{Binding ConfigVdfPath, UpdateSourceTrigger=PropertyChanged}"
+                                                     Grid.Column="0"
+                                                     Margin="0,0,10,0"/>
+                                            <Button Content="Browse..."
+                                                    Grid.Column="1"
+                                                    Command="{Binding BrowseConfigVdfCommand}"
+                                                    Style="{StaticResource SecondaryButtonStyle}"
+                                                    Padding="15,8"/>
+                                        </Grid>
+
+                                        <TextBlock Text="Combinedkeys.key File Path"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,5"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Text="{Binding CombinedKeysPath, UpdateSourceTrigger=PropertyChanged}"
+                                                     Grid.Column="0"
+                                                     Margin="0,0,10,0"/>
+                                            <Button Content="Browse..."
+                                                    Grid.Column="1"
+                                                    Command="{Binding BrowseCombinedKeysCommand}"
+                                                    Style="{StaticResource SecondaryButtonStyle}"
+                                                    Padding="15,8"/>
+                                        </Grid>
+
+                                        <TextBlock TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   FontSize="12"
+                                                   FontStyle="Italic"
+                                                   Margin="0,10,0,0">
+                                            These paths are used for extracting depot keys from your Steam config.vdf file.<LineBreak/>
+                                            The combinedkeys.key file is optional and used to filter out already-known keys.
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- GBE Token Generator Sub-Tab -->
+                    <TabItem Header="GBE Token Generator">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+                                <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                                    <StackPanel>
+                                        <TextBlock Text="GBE Token Generator"
+                                                   FontSize="20"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   Margin="0,0,0,15"/>
+
+                                        <TextBlock Text="Steam Web API Key"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,5"/>
+                                        <TextBox Text="{Binding GBESteamWebApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,0,0,5"/>
+                                        <TextBlock TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   FontSize="11"
+                                                   Margin="0,0,0,15">
+                                            Get your Steam Web API key at: <Hyperlink NavigateUri="https://steamcommunity.com/dev/apikey"
+                                                                                       RequestNavigate="Hyperlink_RequestNavigate"
+                                                                                       Foreground="{DynamicResource AccentBrush}">
+                                                https://steamcommunity.com/dev/apikey
+                                            </Hyperlink>
+                                        </TextBlock>
+
+                                        <TextBlock Text="Default Output Path"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   Margin="0,0,0,5"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Grid.Column="0"
+                                                     Text="{Binding GBETokenOutputPath, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="True"
+                                                     Margin="0,0,10,0"/>
+                                            <Button Grid.Column="1"
+                                                    Content="Browse"
+                                                    Style="{StaticResource SecondaryButtonStyle}"
+                                                    Command="{Binding BrowseGBEOutputPathCommand}"
+                                                    Padding="20,8"/>
+                                        </Grid>
+
+                                        <TextBlock TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   FontSize="12"
+                                                   FontStyle="Italic"
+                                                   Margin="0,10,0,0">
+                                            The GBE Token Generator creates Goldberg Emulator configuration files.<LineBreak/>
+                                            Requires Steam to be running and the game to be owned by your logged-in account.
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                </TabControl>
+            </TabItem>
+
+            <!-- TAB 7: Fix Game -->
+            <TabItem Header="Fix Game">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Fix Game Configuration"
+                                           FontSize="20" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Steam Web API Key (required for achievements)"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                                <TextBlock Text="Get your key at: https://steamcommunity.com/dev/apikey"
+                                           Foreground="{DynamicResource AccentBrush}" FontSize="11" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <PasswordBox Grid.Column="0"
+                                                 x:Name="FixGameApiKeyPasswordBox"
+                                                 PasswordChanged="FixGameApiKeyPasswordBox_PasswordChanged"
+                                                 Padding="10,8"
+                                                 VerticalContentAlignment="Center"
+                                                 Visibility="{Binding IsFixGameApiKeyVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding FixGameSteamWebApiKey, UpdateSourceTrigger=PropertyChanged}"
+                                             Padding="10,8"
+                                             VerticalContentAlignment="Center"
+                                             Visibility="{Binding IsFixGameApiKeyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                    <ToggleButton Grid.Column="1"
+                                                  IsChecked="{Binding IsFixGameApiKeyVisible}"
+                                                  Margin="6,0,0,0" Padding="8,6" Cursor="Hand"
+                                                  ToolTip="Show / hide API key">
+                                        <ToggleButton.Style>
+                                            <Style TargetType="ToggleButton">
+                                                <Setter Property="Background" Value="{DynamicResource SecondaryDarkBrush}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                                <Setter Property="BorderThickness" Value="1"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border Background="{TemplateBinding Background}"
+                                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundBrush}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToggleButton.Style>
+                                        <iconPacks:PackIconLucide Width="14" Height="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}">
+                                            <iconPacks:PackIconLucide.Style>
+                                                <Style TargetType="iconPacks:PackIconLucide" BasedOn="{StaticResource {x:Type iconPacks:PackIconLucide}}">
+                                                    <Setter Property="Kind" Value="Eye"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsFixGameApiKeyVisible}" Value="True">
+                                                            <Setter Property="Kind" Value="EyeOff"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </iconPacks:PackIconLucide.Style>
+                                        </iconPacks:PackIconLucide>
+                                    </ToggleButton>
+
+                                    <Button Grid.Column="2"
+                                            Command="{Binding CopyFixGameApiKeyCommand}"
+                                            Margin="6,0,0,0" Padding="8,6" Cursor="Hand"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            ToolTip="Copy API key">
+                                        <iconPacks:PackIconLucide Kind="Copy" Width="14" Height="14"/>
+                                    </Button>
+                                </Grid>
+
+                                <TextBlock Text="Language"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding FixGameLanguage}" SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          Margin="0,0,0,10">
+                                    <ComboBoxItem Content="English" Tag="english"/>
+                                    <ComboBoxItem Content="French" Tag="french"/>
+                                    <ComboBoxItem Content="German" Tag="german"/>
+                                    <ComboBoxItem Content="Spanish" Tag="spanish"/>
+                                    <ComboBoxItem Content="Italian" Tag="italian"/>
+                                    <ComboBoxItem Content="Portuguese" Tag="portuguese"/>
+                                    <ComboBoxItem Content="Russian" Tag="russian"/>
+                                    <ComboBoxItem Content="Japanese" Tag="japanese"/>
+                                    <ComboBoxItem Content="Simplified Chinese" Tag="schinese"/>
+                                    <ComboBoxItem Content="Korean" Tag="koreana"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Player Name"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding FixGamePlayerName, UpdateSourceTrigger=PropertyChanged}"
+                                         Padding="10,8" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Steam ID (for emulator identity)"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding FixGameSteamId, UpdateSourceTrigger=PropertyChanged}"
+                                         Padding="10,8" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Emulator Mode"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding FixGameMode}" SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          Margin="0,0,0,10">
+                                    <ComboBoxItem Content="Regular (DLL replacement)" Tag="regular"/>
+                                    <ComboBoxItem Content="ColdClient (loader injection)" Tag="coldclient"/>
+                                </ComboBox>
+
+                                <CheckBox Content="Auto-emu after DepotDownloader download"
+                                          IsChecked="{Binding FixGameAutoAfterDownload}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,5"
+                                          ToolTip="Automatically apply Goldberg emulator when a game finishes downloading via DepotDownloader. Skipped for games with DRM or external account requirements."/>
+
+                                <TextBlock Text="Fix Game will: download Goldberg emulator, generate config (achievements, stats, DLC), unpack SteamStub DRM if present, and replace steam_api DLLs."
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="11" TextWrapping="Wrap" FontStyle="Italic"
+                                           Margin="0,10,0,10"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0"
+                                            Command="{Binding UpdateGoldbergCommand}"
+                                            Padding="15,8" Margin="0,0,8,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Download" Width="14" Height="14" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding GoldbergButtonText}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <TextBlock Grid.Column="1" Text="{Binding GoldbergStatus}"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               FontSize="12" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 8: System -->
+            <TabItem Header="System">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="800" HorizontalAlignment="Left" Margin="0,8,0,0">
+
+                        <!-- Application Behavior -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Application Behavior"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <CheckBox Content="Disable ALL notifications, popups, and toasts"
+                                          IsChecked="{Binding DisableAllNotifications}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          FontWeight="SemiBold"
+                                          ToolTip="Completely disables all notifications, message boxes, and toast popups throughout the app"/>
+
+                                <CheckBox Content="Minimize to system tray"
+                                          IsChecked="{Binding MinimizeToTray}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="When clicking the X button, hide to system tray instead of closing the app"/>
+
+                                <CheckBox Content="Start minimized to tray"
+                                          IsChecked="{Binding StartMinimized}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Start the application minimized to system tray on launch"/>
+
+                                <CheckBox Content="Show notifications"
+                                          IsChecked="{Binding ShowNotifications}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show Windows toast notifications (when OFF, uses traditional message boxes)"/>
+
+                                <CheckBox Content="Show 'game added' notification"
+                                          IsChecked="{Binding ShowGameAddedNotification}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show notification when games are successfully added to library (disable to avoid repetitive popups)"/>
+
+                                <CheckBox Content="Confirm before deleting files"
+                                          IsChecked="{Binding ConfirmBeforeDelete}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show confirmation dialog before deleting downloaded files"/>
+
+                                <CheckBox Content="Confirm before uninstalling games"
+                                          IsChecked="{Binding ConfirmBeforeUninstall}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show confirmation dialog before uninstalling games"/>
+
+                                <CheckBox Content="Always show tray icon (even when window is open)"
+                                          IsChecked="{Binding AlwaysShowTrayIcon}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,15"
+                                          ToolTip="Keep the system tray icon visible at all times (disabled by default)"/>
+
+                                <TextBlock Text="Sidebar"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,5,0,10"/>
+
+                                <CheckBox Content="Show Workshop in sidebar"
+                                          IsChecked="{Binding ShowWorkshopInSidebar}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show or hide the Workshop page in the sidebar navigation"/>
+
+                                <CheckBox Content="Show Cloud Saves in sidebar"
+                                          IsChecked="{Binding ShowCloudSavesInSidebar}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show or hide the Cloud Saves page in the sidebar navigation"/>
+
+                                <CheckBox Content="Show Tools in sidebar"
+                                          IsChecked="{Binding ShowToolsInSidebar}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,10"
+                                          ToolTip="Show or hide the Tools page in the sidebar navigation"/>
+
+                                <CheckBox Content="Hide header images in Library and Store"
+                                          IsChecked="{Binding HideHeaderImages}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}"
+                                          Margin="0,0,0,15"
+                                          ToolTip="Hide game header images for a more compact view"/>
+
+                                <TextBlock Text="Default startup page"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox ItemsSource="{Binding StartupPageOptions}"
+                                          SelectedItem="{Binding DefaultStartupPage}"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          FontSize="14"
+                                          ToolTip="The page to show when the app starts (can be overridden with --page argument)"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Auto-Update -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Auto-Update"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Update Mode"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,5"/>
+                                <ComboBox SelectedValue="{Binding SelectedAutoUpdateMode}"
+                                          SelectedValuePath="Tag"
+                                          Style="{StaticResource ModernComboBoxStyle}"
+                                          FontSize="14"
+                                          Margin="0,0,0,15">
+                                    <ComboBoxItem Content="Disabled" Tag="Disabled"/>
+                                    <ComboBoxItem Content="Check Only (Notify me)" Tag="CheckOnly"/>
+                                    <ComboBoxItem Content="Auto Download &amp; Install" Tag="AutoDownloadAndInstall"/>
+                                </ComboBox>
+
+                                <TextBlock Text="• Disabled: Never check for updates"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           Margin="0,0,0,3"/>
+                                <TextBlock Text="• Check Only: Notify when updates are available and ask permission to install"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           Margin="0,0,0,3"/>
+                                <TextBlock Text="• Auto Download &amp; Install: Automatically download and install updates without asking"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           Margin="0,0,0,15"/>
+
+                                <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,10">
+                                    <Run Text="Current Version: "/>
+                                    <Run Text="{Binding CurrentVersion, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <Button Content="Check for Updates Now"
+                                        Command="{Binding CheckForUpdatesCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Padding="20,10"
+                                        HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Maintenance -->
+                        <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <TextBlock Text="Maintenance"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Margin="0,0,0,6"
+                                           Text="{Binding GetCacheSizeFormatted(), StringFormat='Current cache size: {0}'}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding GetCacheSizeFormatted()}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding GetCacheSizeFormatted()}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <Button Content="Clear Cache"
+                                        Command="{Binding ClearCacheCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Padding="20,10"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,0,0,4"/>
+
+                                <TextBlock Text="Clears all cached game icons and API data"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Margin="0,0,0,10"/>
+
+                                <Button Content="Clear Old Logs"
+                                        Command="{Binding ClearLogsCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Padding="20,10"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Deletes all old log files (except current session)"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           FontSize="12"
+                                           FontStyle="Italic"/>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- Single-page view: all sections stacked -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Margin="0,0,0,20"
+                      Visibility="{Binding SinglePageSettings, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      x:Name="SinglePageView"/>
+
+        <!-- Fixed Save Button at Bottom -->
+        <Border Grid.Row="2"
+                Background="Transparent"
+                BorderThickness="0"
+                Padding="0,15,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Padding="40,12"
+                        Command="{Binding SaveSettingsCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        FontSize="16"
+                        FontWeight="SemiBold">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Save" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0"/><TextBlock Text="Save Settings" VerticalAlignment="Center"/></StackPanel>
+                        <TextBlock Text=" *"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   FontWeight="Bold"
+                                   Margin="5,0,0,0"
+                                   Visibility="{Binding HasUnsavedChanges, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="{DynamicResource AccentBrush}"
+                           VerticalAlignment="Center"
+                           Margin="20,0,0,0"
+                           FontSize="14"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,77 @@
+## .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## Visual Studio cache/options
+.vs/
+*.rsuser
+*.user
+*.userosscache
+*.sln.docstates
+
+## User-specific files
+*.suo
+*.user
+*.sln.docstates
+*.userprefs
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+## Publish
+publish/
+*.pubxml
+*.publishproj
+
+## Application settings (contains API keys)
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+## OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+/.claude
+
+## Backup / temp files
+*.bak
+*.tmp
+*.orig
+
+## Test project solution file (can break builds on main)
+Tests/MorrenusApp.slnx
+
+## Fetched build artifacts
+lib/cloud_redirect.dll

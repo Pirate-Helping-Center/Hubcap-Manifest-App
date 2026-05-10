@@ -1,0 +1,172 @@
+<UserControl x:Class="HubcapManifestApp.Views.LuaInstallerPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,30">
+            <TextBlock Text="Lua Installer"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="Install .lua files, .manifest files, or .zip archives to Steam"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" MaxWidth="800" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Drop Zone -->
+            <Border Grid.Row="0"
+                    Style="{StaticResource ModernCardStyle}"
+                    MinHeight="400"
+                    AllowDrop="True"
+                    Drop="DropZone_Drop"
+                    DragEnter="DropZone_DragEnter"
+                    DragLeave="DropZone_DragLeave"
+                    x:Name="DropZone">
+                <Grid>
+                    <!-- Default State -->
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding HasFileSelected, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                        <iconPacks:PackIconLucide Kind="Package" Width="72" Height="72" Margin="0,0,0,20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Drop .zip, .lua, or .manifest files here"
+                                   FontSize="24"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+                        <TextBlock Text="or"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+                        <Button Content="Browse Files"
+                                Command="{Binding BrowseFileCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Padding="30,12"
+                                FontSize="14"
+                                HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,20,0,0"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="600"/>
+                    </StackPanel>
+
+                    <!-- File Selected State -->
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding HasFileSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <iconPacks:PackIconLucide Kind="CircleCheck"
+                                                  Width="72" Height="72"
+                                                  Foreground="{DynamicResource AccentBrush}"
+                                                  HorizontalAlignment="Center"
+                                                  Margin="0,0,0,20"/>
+                        <TextBlock Text="File Selected"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,10"/>
+                        <Border Background="{DynamicResource SecondaryDarkBrush}"
+                                CornerRadius="8"
+                                Padding="20,15"
+                                Margin="0,10,0,20">
+                            <StackPanel>
+                                <TextBlock Text="{Binding SelectedFileName}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="500"/>
+                                <TextBlock Text="{Binding StatusMessage}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,10,0,0"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="500"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <!-- Use the default themed Button so Install matches every other primary button -->
+                            <Button Content="Install"
+                                    Command="{Binding InstallFileCommand}"
+                                    Padding="40,12"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Margin="0,0,10,0"
+                                    IsEnabled="{Binding IsInstalling, Converter={StaticResource InverseBooleanConverter}}"/>
+                            <Button Content="Clear"
+                                    Command="{Binding ClearSelectionCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Padding="30,12"
+                                    FontSize="14"
+                                    IsEnabled="{Binding IsInstalling, Converter={StaticResource InverseBooleanConverter}}"/>
+                        </StackPanel>
+
+                        <!-- Installing Progress -->
+                        <StackPanel Visibility="{Binding IsInstalling, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Margin="0,20,0,0">
+                            <TextBlock Text="Installing..."
+                                       FontSize="14"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,10"/>
+                            <ProgressBar IsIndeterminate="True"
+                                         Height="4"
+                                         Background="{DynamicResource SecondaryDarkBrush}"
+                                         Foreground="{DynamicResource AccentBrush}"
+                                         Width="300"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Help Text -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SecondaryDarkBrush}"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="0,10,0,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <iconPacks:PackIconLucide Kind="Info" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="How it works"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               TextWrapping="Wrap">
+                        <Run Text="• .lua files will be copied to your Steam stplug-in folder"/><LineBreak/>
+                        <Run Text="• .manifest files will be copied to your Steam depotcache folder"/><LineBreak/>
+                        <Run Text="• .zip archives will be extracted automatically"/><LineBreak/>
+                        <Run Text="• Remember to restart Steam after installation for changes to take effect"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

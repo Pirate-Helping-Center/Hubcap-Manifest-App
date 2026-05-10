@@ -1,0 +1,131 @@
+<UserControl x:Class="HubcapManifestApp.Views.GBEDenuvoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20" MaxWidth="700" HorizontalAlignment="Left">
+
+                <!-- Title -->
+                <TextBlock Text="GBE Token Generator"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           Margin="0,0,0,20"/>
+
+                <TextBlock Text="Generate Goldberg Emulator tokens for games. This requires Steam to be running and the game to be owned by the logged-in account."
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           FontSize="13"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,20"/>
+
+                <!-- App ID Input -->
+                <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Steam App ID"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Enter App ID:" Grid.Column="0" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding AppId, UpdateSourceTrigger=PropertyChanged}"
+                                     MinWidth="200"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Output Path -->
+                <Border Style="{StaticResource ModernCardStyle}" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Output Directory"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged}"
+                                     IsReadOnly="True"
+                                     Margin="0,0,10,0"/>
+                            <Button Grid.Column="1"
+                                    Command="{Binding BrowseOutputPathCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Folder" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Browse" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Generate Button -->
+                <Button Command="{Binding GenerateTokenCommand}"
+                        Style="{StaticResource ModernButtonStyle}"
+                        Height="40"
+                        FontSize="13"
+                        Margin="0,0,0,15"
+                        IsEnabled="{Binding IsNotGenerating}"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="KeyRound" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Generate Token" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+
+                <!-- Progress Indicator -->
+                <ProgressBar IsIndeterminate="True"
+                            Height="4"
+                            Margin="0,0,0,15"
+                            Visibility="{Binding IsGenerating, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Log Output -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Log Output"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,10"/>
+                        <Border Background="{DynamicResource CardBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10"
+                                Height="250">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock Text="{Binding LogOutput}"
+                                          FontFamily="Consolas"
+                                          FontSize="11"
+                                          Foreground="{DynamicResource TextSecondaryBrush}"
+                                          TextWrapping="Wrap"/>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Credits section -->
+                <Border Style="{StaticResource ModernCardStyle}" Margin="0,15,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Credits"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap">
+                            <Run Text="GBE Token Generator developed by:"/>
+                            <LineBreak/>
+                            <Run Text="• Detanup01" FontWeight="Medium"/>
+                            <LineBreak/>
+                            <Run Text="• NotAndreh" FontWeight="Medium"/>
+                            <LineBreak/>
+                            <Run Text="• Oureverday" FontWeight="Medium"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

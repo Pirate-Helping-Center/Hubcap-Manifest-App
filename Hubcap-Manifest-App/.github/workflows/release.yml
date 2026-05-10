@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = if ('${{ github.event_name }}' -eq 'workflow_dispatch') { '${{ github.event.inputs.tag }}' } else { '${{ github.ref_name }}' }
+          $version = $tag -replace '^v',''
+          # Pad to 4-part version expected by AssemblyVersion (e.g. 1.2 -> 1.2.0.0)
+          $parts = $version -split '\.'
+          while ($parts.Count -lt 4) { $parts += '0' }
+          $version = $parts -join '.'
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "tag=$tag version=$version"
+
+      - name: Restore
+        run: dotnet restore HubcapApp.csproj
+
+      - name: Publish
+        run: dotnet publish HubcapApp.csproj -c Release -p:Version=${{ steps.version.outputs.version }} --no-restore
+
+      - name: Stage release assets
+        id: stage
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Filter HubcapManifestApp.exe -Path bin/Release | Where-Object { $_.FullName -match 'publish' } | Select-Object -First 1
+          if (-not $exe) { throw "Could not locate published HubcapManifestApp.exe under bin/Release" }
+          New-Item -ItemType Directory -Path release-assets -Force | Out-Null
+          Copy-Item $exe.FullName -Destination release-assets/HubcapManifestApp.exe
+          $hash = (Get-FileHash release-assets/HubcapManifestApp.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  HubcapManifestApp.exe" | Out-File -FilePath release-assets/sha256.txt -Encoding ASCII
+          Write-Host "exe=$($exe.FullName)"
+          Write-Host "hash=$hash"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            release-assets/HubcapManifestApp.exe
+            release-assets/sha256.txt

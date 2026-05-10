@@ -1,0 +1,796 @@
+<UserControl x:Class="HubcapManifestApp.Views.StorePage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+    <Grid Margin="20,15,20,15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="Store"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   Margin="0,0,0,10"/>
+
+        <!-- Search Bar and Controls -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="0,0,10,0">
+                <!-- Border gives the whole thing the search-box look; the icon lives
+                     in its own column so it cannot fight the TextBox's ScrollViewer
+                     padding. The inner TextBox is transparent/borderless. -->
+                <Border Height="34"
+                        Background="{DynamicResource SecondaryDarkBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <iconPacks:PackIconLucide Grid.Column="0"
+                                                  Kind="Search"
+                                                  Width="14" Height="14"
+                                                  VerticalAlignment="Center"
+                                                  Margin="8,0,4,0"
+                                                  Foreground="{DynamicResource TextSecondaryBrush}"
+                                                  IsHitTestVisible="False"/>
+                        <TextBox Grid.Column="1"
+                                 x:Name="SearchTextBox"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="13"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 CaretBrush="{DynamicResource TextPrimaryBrush}"
+                                 Padding="0,0,8,0"
+                                 VerticalContentAlignment="Center"
+                                 LostFocus="SearchTextBox_LostFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding SearchGamesCommand}"/>
+                                <KeyBinding Key="Escape" Command="{Binding HideSuggestionsCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </Grid>
+                </Border>
+
+                <Popup x:Name="SuggestionsPopup"
+                       PlacementTarget="{Binding ElementName=SearchTextBox}"
+                       Placement="Bottom"
+                       IsOpen="{Binding ShowSuggestions}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade">
+                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource AccentBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Width="{Binding ActualWidth, ElementName=SearchTextBox}"
+                            MaxHeight="300">
+                        <ListBox ItemsSource="{Binding Suggestions}"
+                                 SelectedItem="{Binding SelectedSuggestion}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding AppId}"
+                                                   Foreground="{DynamicResource AccentBrush}"
+                                                   FontWeight="SemiBold"
+                                                   Width="70"
+                                                   Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Name}"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="8,5"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="Bd"
+                                                        Background="{TemplateBinding Background}"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SecondaryDarkBrush}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="SuggestionItem_Click"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Border>
+                </Popup>
+            </Grid>
+
+            <CheckBox Grid.Column="1"
+                      Content="AppID"
+                      IsChecked="{Binding SearchByAppId}"
+                      Foreground="{DynamicResource TextPrimaryBrush}"
+                      VerticalAlignment="Center"
+                      Margin="0,0,10,0"
+                      ToolTip="Search by exact App ID only"/>
+
+            <Button Grid.Column="2"
+                    Command="{Binding SearchGamesCommand}"
+                    Height="34"
+                    Padding="30,5"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Search" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Search" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+        </Grid>
+
+        <!-- Status and Sort Options -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,10">
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       FontSize="12"
+                       Margin="0,0,0,8"/>
+
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Text="Sort:"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,6"/>
+
+                <ComboBox SelectedValue="{Binding SortBy}"
+                          SelectedValuePath="Tag"
+                          FontSize="12"
+                          Height="34"
+                          MinHeight="0"
+                          Padding="8,5"
+                          Margin="0,0,6,6">
+                    <ComboBoxItem Content="Newest First" Tag="updated"/>
+                    <ComboBoxItem Content="Oldest First" Tag="date_oldest"/>
+                    <ComboBoxItem Content="Name A-Z" Tag="name"/>
+                    <ComboBoxItem Content="Name Z-A" Tag="name_desc"/>
+                    <ComboBoxItem Content="Recently Updated" Tag="updated_newest"/>
+                    <ComboBoxItem Content="Least Recently Updated" Tag="updated_oldest"/>
+                </ComboBox>
+
+                <Button Style="{StaticResource SecondaryButtonStyle}"
+                        Command="{Binding LoadGamesCommand}"
+                        Height="34"
+                        Padding="10,5"
+                        Margin="0,0,6,6"
+                        ToolTip="Load library"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="RefreshCw" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Load" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+
+                <Button Style="{StaticResource SecondaryButtonStyle}"
+                        Command="{Binding ToggleSelectModeCommand}"
+                        Height="34"
+                        Padding="10,5"
+                        Margin="0,0,6,6"
+                        Visibility="{Binding IsSteamToolsMode, Converter={StaticResource BooleanToVisibilityConverter}}"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="SquareCheck" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Select Mode" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+
+                <Button Command="{Binding ToggleViewCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Height="34"
+                        Padding="10,5"
+                        Margin="0,0,0,6">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconLucide Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,6,0">
+                                <iconPacks:PackIconLucide.Style>
+                                    <Style TargetType="iconPacks:PackIconLucide" BasedOn="{StaticResource {x:Type iconPacks:PackIconLucide}}">
+                                        <Setter Property="Kind" Value="LayoutGrid"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsListView}" Value="True">
+                                                <Setter Property="Kind" Value="List"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconPacks:PackIconLucide.Style>
+                            </iconPacks:PackIconLucide>
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding IsListView, Converter={StaticResource BoolToViewTextConverter}, Mode=OneWay}"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Batch Actions Bar (Select Mode) -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource SecondaryDarkBrush}"
+                Padding="15" CornerRadius="8" Margin="0,0,0,10"
+                Visibility="{Binding IsSelectMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Select All"
+                            Command="{Binding SelectAllCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Padding="12,6" Margin="0,0,10,0"/>
+                    <Button Content="Deselect All"
+                            Command="{Binding DeselectAllCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Padding="12,6" Margin="0,0,10,0"/>
+                    <Button Command="{Binding DownloadSelectedCommand}" Padding="12,6">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconLucide Kind="Download" Width="14" Height="14" VerticalAlignment="Center"/>
+                            <TextBlock Text="Download Selected" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                           VerticalAlignment="Center" HorizontalAlignment="Right"
+                           Text="{Binding SelectedCount, StringFormat='{}{0} selected'}"/>
+            </Grid>
+        </Border>
+
+        <!-- Games Grid/List -->
+        <ScrollViewer x:Name="StoreScrollViewer"
+                      Grid.Row="4"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Games}">
+                <ItemsControl.Style>
+                    <Style TargetType="ItemsControl">
+                        <Setter Property="ItemsPanel">
+                            <Setter.Value>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsListView}" Value="True">
+                                <Setter Property="ItemsPanel">
+                                    <Setter.Value>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ItemsControl.Style>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border MouseLeftButtonUp="GameCard_MouseLeftButtonUp" Cursor="Hand">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource ModernCardStyle}">
+                                    <Setter Property="Width" Value="280"/>
+                                    <Setter Property="Height" Value="350"/>
+                                    <Setter Property="Margin" Value="0,0,20,20"/>
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                            <Setter Property="Height" Value="Auto"/>
+                                            <Setter Property="Margin" Value="0,0,0,6"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Game Image Container -->
+                                <Grid Visibility="{Binding DataContext.HideHeaderImages, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Grid.Row" Value="0"/>
+                                            <Setter Property="Grid.Column" Value="0"/>
+                                            <Setter Property="Grid.ColumnSpan" Value="3"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                    <Setter Property="Grid.Row" Value="0"/>
+                                                    <Setter Property="Grid.Column" Value="0"/>
+                                                    <Setter Property="Grid.ColumnSpan" Value="1"/>
+                                                    <Setter Property="Grid.RowSpan" Value="3"/>
+                                                    <Setter Property="Margin" Value="2"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+
+                                    <!-- Game Image -->
+                                    <Border Background="{DynamicResource SecondaryDarkBrush}"
+                                            CornerRadius="8">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Width" Value="280"/>
+                                                <Setter Property="Height" Value="131"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                        <Setter Property="Width" Value="180"/>
+                                                        <Setter Property="Height" Value="84"/>
+                                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <!-- Show cached icon if available -->
+                                            <Image Source="{Binding CachedIconPath}"
+                                                   Stretch="Uniform"
+                                                   Visibility="{Binding CachedIconPath, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                                            <!-- Placeholder if no icon -->
+                                            <iconPacks:PackIconLucide Kind="Gamepad2" Width="64" Height="64" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                       Visibility="{Binding CachedIconPath, Converter={StaticResource InverseNullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Select Mode Checkbox -->
+                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Top"
+                                              Margin="8"
+                                              Visibility="{Binding DataContext.IsSelectMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                    <!-- Manifest Status Badge (Grid View only - overlaid on image) -->
+                                    <Border CornerRadius="4"
+                                            Padding="8,4"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top"
+                                            Margin="8">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False"/>
+                                                            <Condition Binding="{Binding ManifestAvailable}" Value="True"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                                    </MultiDataTrigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False"/>
+                                                            <Condition Binding="{Binding ManifestAvailable}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Setter Property="Background" Value="#CC666666"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="White">
+                                                <iconPacks:PackIconLucide.Style>
+                                                    <Style TargetType="iconPacks:PackIconLucide" BasedOn="{StaticResource {x:Type iconPacks:PackIconLucide}}">
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ManifestAvailable}" Value="True">
+                                                                <Setter Property="Kind" Value="Check"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ManifestAvailable}" Value="False">
+                                                                <Setter Property="Kind" Value="Hourglass"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </iconPacks:PackIconLucide.Style>
+                                            </iconPacks:PackIconLucide>
+                                            <TextBlock FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ManifestAvailable}" Value="True">
+                                                                <Setter Property="Text" Value="Available"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ManifestAvailable}" Value="False">
+                                                                <Setter Property="Text" Value="Pending"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Downloaded Badge (Grid View only - overlaid on image) -->
+                                    <Border CornerRadius="4"
+                                            Padding="8,4"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Margin="8"
+                                            Background="#CC4CAF50"
+                                            Visibility="{Binding IsInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False"/>
+                                                            <Condition Binding="{Binding IsInstalled}" Value="True"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Check" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="White"/>
+                                            <TextBlock Text="Downloaded" FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Game Info (Grid View) -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="10,8,10,5"
+                                            Visibility="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding GameName}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               TextWrapping="Wrap"
+                                               MaxHeight="60"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <TextBlock Text="{Binding GameId, StringFormat='App ID: {0}'}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <!-- Game Info (List View) -->
+                                <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" Margin="10" VerticalAlignment="Center"
+                                      Visibility="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Top row: Badge + Name -->
+                                    <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Border CornerRadius="4"
+                                                Padding="6,3"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,10,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ManifestAvailable}" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ManifestAvailable}" Value="False">
+                                                            <Setter Property="Background" Value="#CC666666"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel Orientation="Horizontal">
+                                                <iconPacks:PackIconLucide Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="White">
+                                                    <iconPacks:PackIconLucide.Style>
+                                                        <Style TargetType="iconPacks:PackIconLucide" BasedOn="{StaticResource {x:Type iconPacks:PackIconLucide}}">
+                                                            <Setter Property="Foreground" Value="White"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ManifestAvailable}" Value="True">
+                                                                    <Setter Property="Kind" Value="Check"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ManifestAvailable}" Value="False">
+                                                                    <Setter Property="Kind" Value="Hourglass"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </iconPacks:PackIconLucide.Style>
+                                                </iconPacks:PackIconLucide>
+                                                <TextBlock FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ManifestAvailable}" Value="True">
+                                                                    <Setter Property="Text" Value="Available"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding ManifestAvailable}" Value="False">
+                                                                    <Setter Property="Text" Value="Pending"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Downloaded Badge (List View) -->
+                                        <Border CornerRadius="4"
+                                                Padding="6,3"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,10,0"
+                                                Background="#CC4CAF50"
+                                                Visibility="{Binding IsInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <iconPacks:PackIconLucide Kind="Check" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="White"/>
+                                                <TextBlock Text="Downloaded" FontSize="10" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Text="{Binding GameName}"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center"/>
+                                    </WrapPanel>
+
+                                    <!-- Bottom row: Details -->
+                                    <WrapPanel Grid.Row="1" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding GameId, StringFormat='App ID: {0}'}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,12,0"/>
+
+                                        <TextBlock Text="{Binding UploadedDate, StringFormat='Added: {0:MMM d}'}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,12,0"/>
+
+                                        <TextBlock Text="{Binding ManifestSize, Converter={StaticResource BytesToStringConverter}, TargetNullValue='Unknown'}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                    </WrapPanel>
+                                </Grid>
+
+                                <!-- Bottom Section (Grid View) - Pinned to bottom -->
+                                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="10,5,10,10"
+                                            Visibility="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                    <TextBlock FontSize="10"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Margin="0,0,0,8"
+                                               HorizontalAlignment="Center">
+                                        <Run Text="{Binding ManifestSize, Converter={StaticResource BytesToStringConverter}, TargetNullValue='Unknown'}"/>
+                                        <Run Text=" | "/>
+                                        <Run Text="{Binding UploadedDate, StringFormat='Added: {0:MMM d}'}"/>
+                                    </TextBlock>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Download Button (show when not installed) -->
+                                        <Button Grid.Column="0" Grid.ColumnSpan="2"
+                                                Command="{Binding DataContext.DownloadGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding ManifestAvailable}"
+                                                Visibility="{Binding IsInstalled, Converter={StaticResource InverseBooleanToVisibilityConverter}}"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Download" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Download" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+
+                                        <!-- Installed + Update buttons (show when installed) -->
+                                        <Button Grid.Column="0"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                IsEnabled="False"
+                                                Margin="0,0,5,0"
+                                                Visibility="{Binding IsInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Check" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Installed" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel>
+                                        </Button>
+
+                                        <Button Grid.Column="1"
+                                                Command="{Binding DataContext.UpdateGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding ManifestAvailable}">
+                                            <Button.Visibility>
+                                                <MultiBinding Converter="{StaticResource InstalledAndNotSteamToolsToVisibilityConverter}">
+                                                    <Binding Path="IsInstalled"/>
+                                                    <Binding Path="DataContext.IsSteamToolsMode" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                </MultiBinding>
+                                            </Button.Visibility>
+                                            <StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="RefreshCw" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Update" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Buttons (List View) -->
+                                <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            Margin="10"
+                                            Visibility="{Binding DataContext.IsListView, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <!-- Download Button (show when not installed) -->
+                                    <Button Command="{Binding DataContext.DownloadGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="15,8"
+                                            IsEnabled="{Binding ManifestAvailable}"
+                                            Visibility="{Binding IsInstalled, Converter={StaticResource InverseBooleanToVisibilityConverter}}"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Download" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Download" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel></Button>
+
+                                    <!-- Installed + Update buttons (show when installed) -->
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                                            IsEnabled="False"
+                                            Padding="12,8"
+                                            Margin="0,0,5,0"
+                                            Visibility="{Binding IsInstalled, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="Check" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Installed" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel>
+                                    </Button>
+
+                                    <Button Command="{Binding DataContext.UpdateGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="12,8"
+                                            IsEnabled="{Binding ManifestAvailable}">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource InstalledAndNotSteamToolsToVisibilityConverter}">
+                                                <Binding Path="IsInstalled"/>
+                                                <Binding Path="DataContext.IsSteamToolsMode" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                        <StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="RefreshCw" Width="14" Height="14" VerticalAlignment="Center"/><TextBlock Text="Update" VerticalAlignment="Center" Margin="6,0,0,0"/></StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Pagination Controls -->
+        <StackPanel Grid.Row="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,15,0,0">
+            <Button Command="{Binding PreviousPageCommand}"
+                    IsEnabled="{Binding CanGoPrevious}"
+                    Padding="12,8"
+                    FontSize="14"
+                    Margin="0,0,5,0"
+                    ToolTip="Previous Page"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="ArrowLeft" Width="14" Height="14" VerticalAlignment="Center"/></StackPanel></Button>
+
+            <ItemsControl ItemsSource="{Binding PageNumbers}" Margin="5,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}"
+                                Command="{Binding DataContext.GoToPageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"
+                                Padding="10,8"
+                                FontSize="13"
+                                Margin="2,0"
+                                MinWidth="36">
+                            <Button.Style>
+                                <!-- Own ControlTemplate so the hover state can stay muted
+                                     instead of jumping to the bright AccentHoverBrush that
+                                     ModernButtonStyle's default template trigger uses. -->
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="PageButtonBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="PageButtonBorder" Property="Background" Value="{DynamicResource SecondaryDarkBrush}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                    <Binding Path="."/>
+                                                    <Binding Path="DataContext.CurrentPage" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundBrush}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Command="{Binding NextPageCommand}"
+                    IsEnabled="{Binding CanGoNext}"
+                    Padding="12,8"
+                    FontSize="14"
+                    Margin="5,0,15,0"
+                    ToolTip="Next Page"><StackPanel Orientation="Horizontal"><iconPacks:PackIconLucide Kind="ArrowRight" Width="14" Height="14" VerticalAlignment="Center"/></StackPanel></Button>
+
+            <Border Background="{DynamicResource SecondaryDarkBrush}"
+                    CornerRadius="4"
+                    Padding="8,4"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Go to:"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding GoToPageText, UpdateSourceTrigger=PropertyChanged}"
+                             Width="50"
+                             FontSize="12"
+                             Padding="5,3"
+                             VerticalContentAlignment="Center">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding GoToPageFromTextCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Content="Go"
+                            Command="{Binding GoToPageFromTextCommand}"
+                            Padding="10,5"
+                            FontSize="12"
+                            Margin="5,0,0,0"/>
+                    <TextBlock Text="{Binding TotalPages, StringFormat='/ {0}'}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="5,0,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Loading Overlay -->
+        <Grid Grid.Row="4"
+              Grid.RowSpan="2"
+              Background="#AA000000"
+              Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <iconPacks:PackIconLucide Kind="Hourglass" Width="48" Height="48" Margin="0,0,0,10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Text="Loading..."
+                           FontSize="18"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

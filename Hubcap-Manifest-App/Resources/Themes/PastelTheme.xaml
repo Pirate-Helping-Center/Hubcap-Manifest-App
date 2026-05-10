@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="PrimaryDark">#f0e6f6</Color>
+    <Color x:Key="SecondaryDark">#e8ddf0</Color>
+    <Color x:Key="CardBackground">#f8f4fc</Color>
+    <Color x:Key="CardHover">#ede3f5</Color>
+    <Color x:Key="Accent">#b39ddb</Color>
+    <Color x:Key="AccentHover">#9c7fc4</Color>
+    <Color x:Key="TextPrimary">#4a4a4a</Color>
+    <Color x:Key="TextSecondary">#7a7a8a</Color>
+    <Color x:Key="BorderColor">#d4c4e2</Color>
+    <Color x:Key="Success">#81c784</Color>
+    <Color x:Key="Warning">#ffb74d</Color>
+    <Color x:Key="Danger">#e57373</Color>
+
+    <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDark}"/>
+    <SolidColorBrush x:Key="SecondaryDarkBrush" Color="{StaticResource SecondaryDark}"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>
+    <SolidColorBrush x:Key="CardHoverBrush" Color="{StaticResource CardHover}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource AccentHover}"/>
+    <SolidColorBrush x:Key="ButtonForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource Warning}"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource Danger}"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#b39ddb" Offset="0"/>
+        <GradientStop Color="#9c7fc4" Offset="1"/>
+    </LinearGradientBrush>
+
+
+    <!-- Extended brushes for preset-based custom themes. Default to existing brushes
+         so built-in themes render identically to before. -->
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SecondaryDark}"/>
+    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="{StaticResource CardBackground}"/>
+    <SolidColorBrush x:Key="TitleBarTextBrush" Color="{StaticResource Accent}"/>
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="{StaticResource Accent}"/>
+    <SolidColorBrush x:Key="SidebarActiveTextBrush" Color="#FFFFFFFF"/>
+
+</ResourceDictionary>
