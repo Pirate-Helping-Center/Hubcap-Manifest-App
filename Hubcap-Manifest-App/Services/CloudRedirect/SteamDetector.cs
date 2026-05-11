@@ -21,7 +21,7 @@ public static class SteamDetector
     /// <summary>
     /// The exact Steam client version our patches and RVAs target.
     /// </summary>
-    public const long ExpectedSteamVersion = 1773426488;
+    public const long ExpectedSteamVersion = 1778281814;
 
     /// <summary>
     /// Returns the Steam installation directory, or null if not found.
@@ -90,7 +90,7 @@ public static class SteamDetector
                 var trimmed = line.Trim();
                 if (!trimmed.StartsWith("\"version\""))
                     continue;
-                // format: "version"		"1773426488"
+                // format: "version"		"1778281814"
                 var last = trimmed.LastIndexOf('"');
                 var secondLast = trimmed.LastIndexOf('"', last - 1);
                 if (last > secondLast && secondLast >= 0)

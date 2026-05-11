@@ -49,7 +49,7 @@ namespace HubcapManifestApp.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private const string GitHubApiUrl = "https://api.github.com/repos/{owner}/{repo}/releases/latest";
-        private const string Owner = "Hubcap-manifest";
+        private const string Owner = "Pirate-Helping-Center";
         private const string Repo = "Hubcap-Manifest-App";
 
         public UpdateService(IHttpClientFactory httpClientFactory)

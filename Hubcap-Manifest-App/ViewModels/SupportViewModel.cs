@@ -27,7 +27,7 @@ namespace HubcapManifestApp.ViewModels
             _logger.Info("User opened Discord link from Support tab");
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://discord.gg/hubcapsmanifest",
+                FileName = "https://discord.gg/RNNg5TS7h5",
                 UseShellExecute = true
             });
         }
@@ -38,7 +38,7 @@ namespace HubcapManifestApp.ViewModels
             _logger.Info("User opened GitHub link from Support tab");
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://github.com/Hubcap-manifest/Hubcap-Manifest-App",
+                FileName = "https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App",
                 UseShellExecute = true
             });
         }
