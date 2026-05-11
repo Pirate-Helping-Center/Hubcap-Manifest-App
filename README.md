@@ -10,7 +10,7 @@ Get the latest working version here: [Releases](https://github.com/Pirate-Helpin
 
 **A comprehensive Steam depot and manifest management tool**
 
-[![Latest Release]([[https://img.shields.io/github/v/release/Pirate-Hepling-Center/Hubcap-Manifest-App?include_prereleases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
+[Latest Release](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
 
 </div>
 
