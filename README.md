@@ -1,6 +1,8 @@
 # Original Upload by Hubcap-manifest
 ## This is only a reupload because the original repositorie got deleted!
-### Also fixed the Patches
+Get the latest working version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
+
+## This upload only try's to fix the patches!
 
 # Hubcap Manifest App
 
@@ -8,7 +10,7 @@
 
 **A comprehensive Steam depot and manifest management tool**
 
-[![Latest Release]([https://img.shields.io/github/v/release/Pirate-Hepling-Center/Hubcap-Manifest-App?include_prereleases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App/releases))](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App/releases)
+[![Latest Release]([[https://img.shields.io/github/v/release/Pirate-Hepling-Center/Hubcap-Manifest-App?include_prereleases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
 
 </div>
 
@@ -78,7 +80,7 @@ Hubcap Manifest App is a powerful Windows desktop application for managing Steam
 
 ### Quick Start
 
-1. Download the latest release from [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App/releases)
+1. Download the latest release from [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
 2. Run `HubcapManifestApp.exe`
 
 **That's it!** No installation required. Self-contained single-file executable with all dependencies embedded.
@@ -145,7 +147,7 @@ Thanks to Melly from [Lua Tools](https://discord.gg/Qxeq7RmhXw) and the Hubcap c
 
 <div align="center">
 
-[Discord](https://discord.gg/hubcapsmanifest) | [Website](https://hubcapmanifest.com) | [GitHub](https://github.com/Hubcap-manifest/Hubcap-Manifest-App)
+[Discord](https://discord.gg/hubcapsmanifest) | [Website](https://hubcapmanifest.com) | [GitHub](https://github.com/Hubcap-manifest/)
 
 # Our Links
 
