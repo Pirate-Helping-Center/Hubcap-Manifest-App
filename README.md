@@ -2,9 +2,8 @@
 ## This is only a reupload because the original repositorie got deleted!
 Get the latest working version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
 
-## This upload only try's to fix the patches!
 
-# Hubcap Manifest App
+# PHC Manifest App
 
 <div align="center">
 
@@ -18,7 +17,7 @@ Get the latest working version here: [Releases](https://github.com/Pirate-Helpin
 
 ## Description
 
-Hubcap Manifest App is a powerful Windows desktop application for managing Steam game depots and manifests. Built with .NET 8 and WPF, it features a modern Steam-inspired interface with two operation modes: **SteamTools** (Lua scripts) and **DepotDownloader** (direct game file downloads).
+PHC Manifest App is a powerful Windows desktop application for managing Steam game depots and manifests. Built with .NET 8 and WPF, it features a modern Steam-inspired interface with two operation modes: **SteamTools** (Lua scripts) and **DepotDownloader** (direct game file downloads).
 
 ## Key Features
 
@@ -81,7 +80,7 @@ Hubcap Manifest App is a powerful Windows desktop application for managing Steam
 ### Quick Start
 
 1. Download the latest release from [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
-2. Run `HubcapManifestApp.exe`
+2. Run `PHCManifestApp.exe`
 
 **That's it!** No installation required. Self-contained single-file executable with all dependencies embedded.
 
@@ -94,13 +93,13 @@ Hubcap Manifest App is a powerful Windows desktop application for managing Steam
 ### First Launch
 
 On first launch, the app will:
-- Create settings in `%AppData%\HubcapManifestApp`
+- Create settings in `%AppData%\PHCManifestApp`
 - Detect your Steam installation automatically
 - Create local SQLite database for library caching
 
 ## Configuration
 
-Settings are stored in `%AppData%\HubcapManifestApp` and include:
+Settings are stored in `%AppData%\PHCManifestApp` and include:
 
 | Category | Options |
 |----------|---------|
@@ -140,17 +139,11 @@ The app registers a `hubcapapp://` protocol handler for quick actions from web b
 - [Steamless](https://github.com/atom0s/Steamless) by atom0s (SteamStub unpacker variants)
 - [Goldberg Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator) by Mr_Goldberg
 
-### Community
-Thanks to Melly from [Lua Tools](https://discord.gg/Qxeq7RmhXw) and the Hubcap community for inspiration, testing, and feedback.
-
 ---
 
 <div align="center">
 
-[Discord](https://discord.gg/hubcapsmanifest) | [Website](https://hubcapmanifest.com) | [GitHub](https://github.com/Hubcap-manifest/)
 
-# Our Links
-
-[Discord](https://discord.gg/RNNg5TS7h5) | [GitHub](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App)
+[Discord](https://discord.gg/RNNg5TS7h5) | [GitHub](https://github.com/Pirate-Helping-Center/)
 
 </div>
