@@ -1,5 +1,5 @@
 # Original Upload by Hubcap-manifest
-## This is only a reupload because the original repositorie got deleted!
+## This is only a reupload because the original repo got deleted!
 Get the latest working version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
 
 
