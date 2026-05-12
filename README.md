@@ -1,6 +1,6 @@
 # Original Upload by Hubcap-manifest
 ## This is only a reupload because the original repo got deleted!
-Get the latest working version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
+Get the latest official version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/latest)
 
 
 # PHC Manifest App
@@ -9,7 +9,7 @@ Get the latest working version here: [Releases](https://github.com/Pirate-Helpin
 
 **A comprehensive Steam depot and manifest management tool**
 
-[Latest Release](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
+[Latest unofficial Relese](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
 
 </div>
 
@@ -79,7 +79,7 @@ PHC Manifest App is a powerful Windows desktop application for managing Steam ga
 
 ### Quick Start
 
-1. Download the latest release from [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/tag/Release)
+1. Download the latest release from [Releases](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
 2. Run `PHCManifestApp.exe`
 
 **That's it!** No installation required. Self-contained single-file executable with all dependencies embedded.
@@ -138,6 +138,7 @@ The app registers a `hubcapapp://` protocol handler for quick actions from web b
 - [DepotDownloader](https://github.com/SteamRE/DepotDownloader) by SteamRE
 - [Steamless](https://github.com/atom0s/Steamless) by atom0s (SteamStub unpacker variants)
 - [Goldberg Steam Emulator](https://gitlab.com/Mr_Goldberg/goldberg_emulator) by Mr_Goldberg
+- [CloudRedirect](https://github.com/Selectively11/CloudRedirect) by Selectively11
 
 ---
 
