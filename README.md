@@ -1,6 +1,6 @@
 # Original Upload by Hubcap-manifest
-## This is only a reupload because the original repo got deleted!
-Get the latest official version here: [Releases](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/latest)
+## This Project updates the original App to work with newer Steam Versions
+Get the latest updated version here: [Updated](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
 
 
 # PHC Manifest App
@@ -9,7 +9,7 @@ Get the latest official version here: [Releases](https://github.com/Pirate-Helpi
 
 **A comprehensive Steam depot and manifest management tool**
 
-[Latest unofficial Relese](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
+[Latest official Release](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App/releases/latest)
 
 </div>
 
