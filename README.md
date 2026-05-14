@@ -9,7 +9,7 @@ Get the latest updated version here: [Updated](https://github.com/Pirate-Helping
 
 **A comprehensive Steam depot and manifest management tool**
 
-[Latest official Release](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App/releases/latest)
+[Latest official Release](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/latest)
 
 </div>
 
