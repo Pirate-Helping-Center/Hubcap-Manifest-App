@@ -1,6 +1,7 @@
 # Original Upload by Hubcap-manifest
 ## We are sadly not abel to fix the CludRedirect Patch untill we are provided an working DLL!
 If you want to use the Patches please use [CloudRedirect](https://github.com/Selectively11/CloudRedirect/releases/latest) or wait untill we have an working version
+
 Get the latest updated version here: [Updated](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
 
 
