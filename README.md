@@ -5,7 +5,7 @@
 
 If you want the original version of the app without our branding go here: [Original](https://github.com/Pirate-Helping-Center/Hubcap-Manifest-App-Arcive/releases/latest)
 
-If you want to use the Patches please use [CloudRedirect](https://github.com/Selectively11/CloudRedirect/releases/latest) or wait untill we have an working version
+If you want to use the Patches please use [CloudRedirect](https://github.com/Selectively11/CloudRedirect/releases/latest)
 
 Get the latest updated version here: [Updated](https://github.com/Pirate-Helping-Center/PHC-Manifest-App/releases/latest)
 
